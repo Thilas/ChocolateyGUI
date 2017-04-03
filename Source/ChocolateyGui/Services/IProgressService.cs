@@ -26,6 +26,8 @@ namespace ChocolateyGui.Services
 
         Task<MessageDialogResult> ShowMessageAsync(string title, string message);
 
+        Task DisplayNotificationAsync(string message);
+
         Task StartLoading(string title = null, bool isCancelable = false);
 
         Task StopLoading();

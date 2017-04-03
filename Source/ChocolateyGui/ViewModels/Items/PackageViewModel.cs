@@ -594,7 +594,7 @@ namespace ChocolateyGui.ViewModels.Items
 
         public void Handle(PackageHasUpdateMessage message)
         {
-            if (message.Id != Id)
+            if (!string.Equals(message.Id, Id, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
@@ -608,7 +608,8 @@ namespace ChocolateyGui.ViewModels.Items
             await _progressService.StartLoading(Resources.PackageViewModel_LoadingPackageInfo);
             try
             {
-                var package = await _chocolateyService.GetByVersionAndIdAsync(_id, _version.ToString(), _isPrerelease).ConfigureAwait(false);
+                var version = CanUpdate ? _latestVersion : _version;
+                var package = await _chocolateyService.GetByVersionAndIdAsync(_id, version.ToString(), _isPrerelease).ConfigureAwait(false);
 
                 // Remember current values before mapping to updated version
                 package.IsAbsoluteLatestVersion = this.IsAbsoluteLatestVersion;

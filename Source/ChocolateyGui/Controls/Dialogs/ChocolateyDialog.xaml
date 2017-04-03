@@ -35,7 +35,7 @@
                         Style="{DynamicResource AccentedDialogSquareButton}"
                         Content="{Binding NegativeButtonText, RelativeSource={RelativeSource AncestorType=Dialogs:ChocolateyDialog, Mode=FindAncestor}, UpdateSourceTrigger=PropertyChanged}"
                         Margin="5 0 0 0"
-                        Visibility="Hidden" />
+                        Visibility="Visible" />
             </StackPanel>
         </Grid>
     </MahDialogs:BaseMetroDialog.Content>

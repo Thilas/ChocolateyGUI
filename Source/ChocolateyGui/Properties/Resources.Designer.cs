@@ -490,6 +490,24 @@ namespace ChocolateyGui.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} package(s) can be updated..
+        /// </summary>
+        public static string LocalSourceViewModel_UpdatesAvailable {
+            get {
+                return ResourceManager.GetString("LocalSourceViewModel_UpdatesAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} package(s) have been successfully updated..
+        /// </summary>
+        public static string LocalSourceViewModel_UpdatesDone {
+            get {
+                return ResourceManager.GetString("LocalSourceViewModel_UpdatesDone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Authors:.
         /// </summary>
         public static string PackageView_Authors {
@@ -1154,11 +1172,29 @@ namespace ChocolateyGui.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Every: .
+        /// </summary>
+        public static string SettingsView_Every {
+            get {
+                return ResourceManager.GetString("SettingsView_Every", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Features.
         /// </summary>
         public static string SettingsView_Features {
             get {
                 return ResourceManager.GetString("SettingsView_Features", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to hours.
+        /// </summary>
+        public static string SettingsView_Hours {
+            get {
+                return ResourceManager.GetString("SettingsView_Hours", resourceCulture);
             }
         }
         
@@ -1397,6 +1433,24 @@ namespace ChocolateyGui.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatic Check.
+        /// </summary>
+        public static string SettingsView_ToggleAutomaticCheck {
+            get {
+                return ResourceManager.GetString("SettingsView_ToggleAutomaticCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatic Update.
+        /// </summary>
+        public static string SettingsView_ToggleAutomaticUpdate {
+            get {
+                return ResourceManager.GetString("SettingsView_ToggleAutomaticUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Default to Tile View for Local Source.
         /// </summary>
         public static string SettingsView_ToggleDefaultTileViewLocal {
@@ -1511,6 +1565,24 @@ namespace ChocolateyGui.Properties {
         public static string ShellView_ButtonSettings {
             get {
                 return ResourceManager.GetString("ShellView_ButtonSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close ChocolateyGUI.
+        /// </summary>
+        public static string ShellView_SystrayMenuClose {
+            get {
+                return ResourceManager.GetString("ShellView_SystrayMenuClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ChocolateyGUI.
+        /// </summary>
+        public static string ShellView_SystrayTitle {
+            get {
+                return ResourceManager.GetString("ShellView_SystrayTitle", resourceCulture);
             }
         }
         

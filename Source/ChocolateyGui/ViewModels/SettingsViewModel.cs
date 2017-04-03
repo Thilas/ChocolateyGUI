@@ -31,7 +31,10 @@ namespace ChocolateyGui.ViewModels
                                                                        {
                                                                            nameof(ShowConsoleOutput),
                                                                            nameof(DefaultToTileViewForLocalSource),
-                                                                           nameof(DefaultToTileViewForRemoteSource)
+                                                                           nameof(DefaultToTileViewForRemoteSource),
+                                                                           nameof(AutomaticCheck),
+                                                                           nameof(AutomaticUpdate),
+                                                                           nameof(AutomaticPeriod)
                                                                        };
 
         private readonly IChocolateyService _packageService;
@@ -107,6 +110,48 @@ namespace ChocolateyGui.ViewModels
             set
             {
                 _config.DefaultToTileViewForRemoteSource = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public bool AutomaticCheck
+        {
+            get
+            {
+                return _config.AutomaticCheck;
+            }
+
+            set
+            {
+                _config.AutomaticCheck = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public bool AutomaticUpdate
+        {
+            get
+            {
+                return _config.AutomaticUpdate;
+            }
+
+            set
+            {
+                _config.AutomaticUpdate = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public int AutomaticPeriod
+        {
+            get
+            {
+                return _config.AutomaticPeriod;
+            }
+
+            set
+            {
+                _config.AutomaticPeriod = value;
                 NotifyOfPropertyChange();
             }
         }

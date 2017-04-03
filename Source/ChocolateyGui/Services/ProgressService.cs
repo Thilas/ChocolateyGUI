@@ -80,12 +80,36 @@ namespace ChocolateyGui.Services
             {
                 if (ShellView != null)
                 {
-                    return await RunOnUIAsync(() => ShellView.ShowMessageAsync(title, message));
+                    return await RunOnUIAsync(async () =>
+                    {
+                        if (!ShellView.IsVisible)
+                        {
+                            ShellView.DisplayNotification(title, message);
+                            return MessageDialogResult.Affirmative;
+                        }
+
+                        return await ShellView.ShowMessageAsync(title, message);
+                    });
                 }
 
                 return MessageBox.Show(message, title) == MessageBoxResult.OK
                            ? MessageDialogResult.Affirmative
                            : MessageDialogResult.Negative;
+            }
+        }
+
+        public async Task DisplayNotificationAsync(string message)
+        {
+            using (await _lock.EnterAsync())
+            {
+                await RunOnUIAsync(() =>
+                {
+                    if (ShellView != null)
+                    {
+                        ShellView.DisplayNotification(message);
+                    }
+                    return Task.FromResult(0);
+                });
             }
         }
 

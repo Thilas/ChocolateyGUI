@@ -15,6 +15,7 @@ using Caliburn.Micro;
 using ChocolateyGui.Controls.Dialogs;
 using ChocolateyGui.Providers;
 using ChocolateyGui.Services;
+using Hardcodet.Wpf.TaskbarNotification;
 using MahApps.Metro.Controls.Dialogs;
 
 namespace ChocolateyGui.Views
@@ -30,6 +31,8 @@ namespace ChocolateyGui.Views
 
         private readonly IProgressService _progressService;
 
+        private WindowState _currentState;
+
         private bool _closeInitiated = false;
 
         public ShellView(
@@ -38,6 +41,8 @@ namespace ChocolateyGui.Views
             IConfigService configService)
         {
             InitializeComponent();
+
+            _currentState = WindowState;
 
             var service = progressService as ProgressService;
             if (service != null)
@@ -57,6 +62,8 @@ namespace ChocolateyGui.Views
             {
                 Environment.CurrentDirectory = Bootstrapper.ApplicationFilesPath;
             }
+
+            SystrayIcon.Visibility = Visibility.Visible;
         }
 
         public void CheckOperatingSystemCompatibility()
@@ -105,6 +112,29 @@ namespace ChocolateyGui.Views
             });
         }
 
+        public void DisplayNotification(string message)
+        {
+            DisplayNotification(Properties.Resources.ShellView_SystrayTitle, message);
+        }
+
+        public void DisplayNotification(string title, string message)
+        {
+            SystrayIcon.ShowBalloonTip(title, message, BalloonIcon.None);
+        }
+
+        protected override void OnStateChanged(EventArgs e)
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                WindowState = _currentState;
+                Hide();
+                return;
+            }
+
+            _currentState = WindowState;
+            base.OnStateChanged(e);
+        }
+
         protected override void OnClosing(CancelEventArgs e)
         {
             if (!_closeInitiated)
@@ -136,5 +166,31 @@ namespace ChocolateyGui.Views
             Process.Start(new ProcessStartInfo(e.Parameter.ToString()));
             e.Handled = true;
         }
+
+        private void OnSystrayLeftMouseUp(object sender, RoutedEventArgs e)
+        {
+            if (IsVisible)
+            {
+                Hide();
+            }
+            else
+            {
+                Show();
+                Activate();
+            }
+        }
+
+        private void OnSystrayBalloonTipClicked(object sender, RoutedEventArgs e)
+        {
+            if (!IsVisible)
+            {
+                Show();
+            }
+
+            Activate();
+        }
+
+        private void OnSystrayCloseMenuClick(object sender, RoutedEventArgs e)
+            => Close();
     }
 }

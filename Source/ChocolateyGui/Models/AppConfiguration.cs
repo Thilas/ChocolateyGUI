@@ -4,6 +4,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+
 namespace ChocolateyGui.Models
 {
     public class AppConfiguration
@@ -15,5 +17,19 @@ namespace ChocolateyGui.Models
         public bool DefaultToTileViewForLocalSource { get; set; }
 
         public bool DefaultToTileViewForRemoteSource { get; set; }
+
+        public bool AutomaticCheck { get; set; }
+
+        public bool AutomaticUpdate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the automatic period, in hours.
+        /// </summary>
+        /// <value>
+        /// The automatic period, in hours.
+        /// </value>
+        public int AutomaticPeriod { get; set; } = 24;
+
+        public TimeSpan AutomaticTimespan => TimeSpan.FromHours(AutomaticPeriod);
     }
 }

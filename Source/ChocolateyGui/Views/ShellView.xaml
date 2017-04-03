@@ -7,6 +7,7 @@
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:cal="http://www.caliburnproject.org"
                    xmlns:lang="clr-namespace:ChocolateyGui.Properties"
+                   xmlns:tb="http://www.hardcodet.net/taskbar"
                    mc:Ignorable="d" 
                    Height="768" Width="1366"
                    GlowBrush="{StaticResource HighlightBrush}"
@@ -41,6 +42,20 @@
     <Border Background="{StaticResource BackgroundColorBrush}">
         <Grid>
             <ContentControl x:Name="ActiveItem" />
+            <tb:TaskbarIcon x:Name="SystrayIcon"
+                            IconSource="../chocolateyicon.ico"
+                            ToolTipText="{x:Static lang:Resources.ShellView_SystrayTitle}"
+                            TrayLeftMouseUp="OnSystrayLeftMouseUp"
+                            TrayBalloonTipClicked="OnSystrayBalloonTipClicked"
+                            Visibility="Hidden">
+                <tb:TaskbarIcon.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem x:Name="CloseMenu"
+                                  Header="{x:Static lang:Resources.ShellView_SystrayMenuClose}"
+                                  Click="OnSystrayCloseMenuClick"/>
+                    </ContextMenu>
+                </tb:TaskbarIcon.ContextMenu>
+            </tb:TaskbarIcon>
         </Grid>
     </Border>
 </metro:MetroWindow>

@@ -158,22 +158,21 @@ namespace ChocolateyGui.Controls.Dialogs
 
         private void PART_NegativeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (WrappedDialog.Dispatcher.CheckAccess())
+            Action action = () =>
             {
                 IsCanceled = true;
                 WrappedDialog.PART_NegativeButton.IsEnabled = false;
+                OnCanceled?.Invoke(WrappedDialog);
+            };
+
+            if (WrappedDialog.Dispatcher.CheckAccess())
+            {
+                action();
             }
             else
             {
-                WrappedDialog.Dispatcher.Invoke(() =>
-                {
-                    IsCanceled = true;
-                    WrappedDialog.PART_NegativeButton.IsEnabled = false;
-                    OnCanceled?.Invoke(WrappedDialog);
-                });
+                WrappedDialog.Dispatcher.Invoke(action);
             }
-
-            // Close();
         }
     }
 }

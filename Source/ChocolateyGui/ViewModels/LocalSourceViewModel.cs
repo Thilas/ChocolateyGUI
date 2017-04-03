@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Data;
 using System.Xml;
 using AutoMapper;
@@ -38,6 +39,8 @@ namespace ChocolateyGui.ViewModels
         private readonly IConfigService _configService;
         private readonly IEventAggregator _eventAggregator;
         private readonly IMapper _mapper;
+        private readonly Timer _timer;
+        private bool _updateAll = true;
         private bool _exportAll = true;
         private bool _hasLoaded;
         private bool _matchWord;
@@ -59,6 +62,8 @@ namespace ChocolateyGui.ViewModels
             string displayName,
             IMapper mapper)
         {
+            _timer = new Timer() { AutoReset = false };
+            _timer.Elapsed += OnTimerElapsed;
             _chocolateyService = chocolateyService;
             _progressService = progressService;
             _persistenceService = persistenceService;
@@ -141,11 +146,13 @@ namespace ChocolateyGui.ViewModels
 
         public bool CanUpdateAll()
         {
-            return Packages.Any(p => p.CanUpdate);
+            return _updateAll && !IsLoading && Packages.Any(p => p.CanUpdate && !p.IsPinned);
         }
 
         public async void UpdateAll()
         {
+            _updateAll = false;
+
             try
             {
                 await _progressService.StartLoading(Resources.LocalSourceViewModel_Packages, true);
@@ -155,28 +162,43 @@ namespace ChocolateyGui.ViewModels
                 var token = _progressService.GetCancellationToken();
                 var packages = Packages.Where(p => p.CanUpdate && !p.IsPinned).ToList();
                 double current = 0.0f;
-                foreach (var package in packages)
+                var count = 0;
+                try
                 {
-                    if (token.IsCancellationRequested)
+                    foreach (var package in packages)
                     {
-                        await _progressService.StopLoading();
-                        IsLoading = false;
-                        return;
+                        if (token.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
+                        _progressService.Report(Math.Min(current++ / packages.Count, 100));
+                        await package.Update();
+                        count++;
+                    }
+                }
+                finally
+                {
+                    await _progressService.StopLoading();
+                    IsLoading = false;
+                    await _progressService.DisplayNotificationAsync(string.Format(Resources.LocalSourceViewModel_UpdatesDone, count));
+
+                    if (ShowOnlyPackagesWithUpdate && count == packages.Count)
+                    {
+                        ShowOnlyPackagesWithUpdate = false;
                     }
 
-                    _progressService.Report(Math.Min(current++ / packages.Count, 100));
-                    await package.Update();
+                    RefreshPackages();
                 }
-
-                await _progressService.StopLoading();
-                IsLoading = false;
-                ShowOnlyPackagesWithUpdate = false;
-                RefreshPackages();
             }
             catch (Exception ex)
             {
                 Logger.Fatal("Updated all has failed.", ex);
                 throw;
+            }
+            finally
+            {
+                _updateAll = true;
             }
         }
 
@@ -224,7 +246,7 @@ namespace ChocolateyGui.ViewModels
 
         public bool CanExportAll()
         {
-            return _exportAll;
+            return _exportAll && !IsLoading;
         }
 
         public bool CanRefreshPackages()
@@ -245,7 +267,7 @@ namespace ChocolateyGui.ViewModels
                     PackageSource.Refresh();
                     break;
                 case PackageChangeType.Unpinned:
-                    var package = Packages.First(p => p.Id == message.Id);
+                    var package = Packages.First(p => string.Equals(p.Id, message.Id, StringComparison.OrdinalIgnoreCase));
                     if (package.LatestVersion != null)
                     {
                         PackageSource.Refresh();
@@ -265,7 +287,7 @@ namespace ChocolateyGui.ViewModels
                     break;
 
                 case PackageChangeType.Uninstalled:
-                    Packages.Remove(Packages.First(p => p.Id == message.Id));
+                    Packages.Remove(Packages.First(p => string.Equals(p.Id, message.Id, StringComparison.OrdinalIgnoreCase)));
                     break;
 
                 default:
@@ -318,7 +340,7 @@ namespace ChocolateyGui.ViewModels
 
                 _hasLoaded = true;
 
-                var chocoPackage = _packages.FirstOrDefault(p => p.Id.ToLower() == "chocolatey");
+                var chocoPackage = _packages.FirstOrDefault(p => string.Equals(p.Id, "chocolatey", StringComparison.OrdinalIgnoreCase));
                 if (chocoPackage != null && chocoPackage.CanUpdate)
                 {
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -326,6 +348,8 @@ namespace ChocolateyGui.ViewModels
                         .ConfigureAwait(false);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 }
+
+                StartTimer();
             }
             catch (Exception ex)
             {
@@ -378,6 +402,7 @@ namespace ChocolateyGui.ViewModels
                 Packages.Clear();
 
                 var packages = (await _chocolateyService.GetInstalledPackages())
+                    .OrderByDescending(package => package.Published)
                     .Select(Mapper.Map<IPackageViewModel>).ToList();
 
                 foreach (var packageViewModel in packages)
@@ -389,9 +414,23 @@ namespace ChocolateyGui.ViewModels
                 FirstLoadIncomplete = false;
 
                 var updates = await _chocolateyService.GetOutdatedPackages();
-                foreach (var update in updates)
+                if (updates.Any())
                 {
-                    await _eventAggregator.PublishOnUIThreadAsync(new PackageHasUpdateMessage(update.Item1, update.Item2));
+                    foreach (var update in updates)
+                    {
+                        await _eventAggregator.PublishOnUIThreadAsync(new PackageHasUpdateMessage(update.Item1, update.Item2));
+                    }
+
+                    Packages.Clear();
+                    packages = packages
+                        .OrderBy(package => package.IsLatestVersion)
+                        .ToList();
+                    foreach (var packageViewModel in packages)
+                    {
+                        Packages.Add(packageViewModel);
+                    }
+
+                    await _progressService.DisplayNotificationAsync(string.Format(Resources.LocalSourceViewModel_UpdatesAvailable, updates.Count));
                 }
 
                 PackageSource.Refresh();
@@ -409,6 +448,35 @@ namespace ChocolateyGui.ViewModels
             {
                 IsLoading = false;
             }
+        }
+
+        private void StartTimer()
+        {
+            var config = _configService.GetSettings();
+            if (config.AutomaticCheck)
+            {
+                _timer.Interval = config.AutomaticTimespan.TotalMilliseconds;
+                _timer.Start();
+            }
+        }
+
+        private void OnTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            Execute.OnUIThread(() =>
+            {
+                var config = _configService.GetSettings();
+                if (config.AutomaticCheck)
+                {
+                    RefreshPackages();
+
+                    if (config.AutomaticUpdate)
+                    {
+                        UpdateAll();
+                    }
+
+                    StartTimer();
+                }
+            });
         }
     }
 }

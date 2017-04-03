@@ -118,9 +118,16 @@ namespace ChocolateyGui
                 var elevationProvider = Elevation.Instance;
                 elevationProvider.IsBackgroundRunning = backgroundFeature?.Enabled ?? false;
 
-                App.SplashScreen.Close(TimeSpan.FromMilliseconds(300));
+                if (!App.StartHidden)
+                {
+                    App.SplashScreen.Close(TimeSpan.FromMilliseconds(300));
+                }
 
                 DisplayRootViewFor<ShellViewModel>();
+                if (App.StartHidden)
+                {
+                    Application.MainWindow.Hide();
+                }
             }
             catch (Exception ex)
             {

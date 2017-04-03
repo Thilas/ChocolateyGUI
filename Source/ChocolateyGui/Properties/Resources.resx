@@ -210,6 +210,14 @@ Error: {1}{2}</value>
   <data name="LocalSourceViewModel_UpdateAvailableForChocolatey" xml:space="preserve">
     <value>There's an update available for Chocolatey.</value>
   </data>
+  <data name="LocalSourceViewModel_UpdatesAvailable" xml:space="preserve">
+    <value>{0} package(s) can be updated.</value>
+    <comment>{0} = Number of updatable packages</comment>
+  </data>
+  <data name="LocalSourceViewModel_UpdatesDone" xml:space="preserve">
+    <value>{0} package(s) have been successfully updated.</value>
+    <comment>{0} = Number of updated packages</comment>
+  </data>
   <data name="LocalSourceView_ButtonExport" xml:space="preserve">
     <value>Export</value>
   </data>
@@ -495,8 +503,14 @@ NOTE: Probably only necessary to change in RTL languages.</comment>
   <data name="SettingsView_Credits" xml:space="preserve">
     <value>Credits</value>
   </data>
+  <data name="SettingsView_Every" xml:space="preserve">
+    <value>Every: </value>
+  </data>
   <data name="SettingsView_Features" xml:space="preserve">
     <value>Features</value>
+  </data>
+  <data name="SettingsView_Hours" xml:space="preserve">
+    <value>hours</value>
   </data>
   <data name="SettingsView_Off" xml:space="preserve">
     <value>Off</value>
@@ -558,6 +572,12 @@ NOTE: Probably only necessary to change in RTL languages.</comment>
   <data name="SettingsView_SubheaderChoco" xml:space="preserve">
     <value>Chocolatey</value>
   </data>
+  <data name="SettingsView_ToggleAutomaticCheck" xml:space="preserve">
+    <value>Automatic Check</value>
+  </data>
+  <data name="SettingsView_ToggleAutomaticUpdate" xml:space="preserve">
+    <value>Automatic Update</value>
+  </data>
   <data name="SettingsView_ToggleShowConsoleOutput" xml:space="preserve">
     <value>Show Console Output</value>
   </data>
@@ -566,6 +586,12 @@ NOTE: Probably only necessary to change in RTL languages.</comment>
   </data>
   <data name="ShellView_ButtonSettings" xml:space="preserve">
     <value>settings</value>
+  </data>
+  <data name="ShellView_SystrayMenuClose" xml:space="preserve">
+    <value>Close ChocolateyGUI</value>
+  </data>
+  <data name="ShellView_SystrayTitle" xml:space="preserve">
+    <value>ChocolateyGUI</value>
   </data>
   <data name="SourcesView_Choco" xml:space="preserve">
     <value>chocolatey</value>

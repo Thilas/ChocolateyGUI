@@ -71,7 +71,7 @@ namespace ChocolateyGui.ViewModels
             }
 
             var packageViewModel = ActiveItem as PackageViewModel;
-            if (packageViewModel != null && packageViewModel.Package.Id == message.Package.Id)
+            if (packageViewModel != null && string.Equals(packageViewModel.Package.Id, message.Package.Id, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
